@@ -22,7 +22,7 @@
                     <p class="eyebrow">Thống kê</p>
                     <h1>Báo cáo</h1>
                 </div>
-                <a class="btn btn-outline" href="#">Xuất báo cáo</a>
+                <a class="btn btn-outline" href="${pageContext.request.contextPath}/admin/reports/export">Xuất báo cáo</a>
             </div>
 
             <section class="stats-grid">

@@ -1,6 +1,16 @@
 package uef.edu.vn.beautysalonfuwa.controller;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uef.edu.vn.beautysalonfuwa.model.Customer;
 import uef.edu.vn.beautysalonfuwa.model.Employee;
 import uef.edu.vn.beautysalonfuwa.model.Invoice;
+import uef.edu.vn.beautysalonfuwa.model.ReportSummary;
 import uef.edu.vn.beautysalonfuwa.model.SalonService;
 import uef.edu.vn.beautysalonfuwa.service.AppointmentData;
 import uef.edu.vn.beautysalonfuwa.service.CustomerData;
@@ -266,5 +277,72 @@ public class AdminController {
         model.addAttribute("summaries", reportData.getSummaries());
         model.addAttribute("popularServices", reportData.getPopularServices());
         return "admin/reports";
+    }
+
+    @GetMapping("/admin/reports/export")
+    public void exportReports(HttpServletResponse response) throws IOException {
+        List<ReportSummary> summaries = reportData.getSummaries();
+        List<SalonService> popularServices = reportData.getPopularServices();
+
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=fuwa-report.xlsx");
+
+        try (Workbook workbook = new XSSFWorkbook()) {
+            CellStyle headerStyle = workbook.createCellStyle();
+            Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerStyle.setFont(headerFont);
+
+            Sheet summarySheet = workbook.createSheet("Tong quan");
+            Row titleRow = summarySheet.createRow(0);
+            titleRow.createCell(0).setCellValue("Báo cáo FUWA Salon");
+            titleRow.createCell(1).setCellValue("Ngày xuất: " + LocalDate.now());
+
+            Row summaryHeader = summarySheet.createRow(2);
+            summaryHeader.createCell(0).setCellValue("Nội dung");
+            summaryHeader.createCell(1).setCellValue("Giá trị");
+            summaryHeader.createCell(2).setCellValue("Ghi chú");
+            summaryHeader.getCell(0).setCellStyle(headerStyle);
+            summaryHeader.getCell(1).setCellStyle(headerStyle);
+            summaryHeader.getCell(2).setCellStyle(headerStyle);
+
+            int summaryRowIndex = 3;
+            for (ReportSummary summary : summaries) {
+                Row row = summarySheet.createRow(summaryRowIndex++);
+                row.createCell(0).setCellValue(summary.getTitle());
+                row.createCell(1).setCellValue(summary.getValue());
+                row.createCell(2).setCellValue(summary.getNote());
+            }
+
+            Sheet serviceSheet = workbook.createSheet("Dich vu pho bien");
+            Row serviceHeader = serviceSheet.createRow(0);
+            serviceHeader.createCell(0).setCellValue("ID");
+            serviceHeader.createCell(1).setCellValue("Dịch vụ");
+            serviceHeader.createCell(2).setCellValue("Danh mục");
+            serviceHeader.createCell(3).setCellValue("Lượt đặt");
+            serviceHeader.createCell(4).setCellValue("Doanh thu");
+            for (int i = 0; i < 5; i++) {
+                serviceHeader.getCell(i).setCellStyle(headerStyle);
+            }
+
+            int serviceRowIndex = 1;
+            for (SalonService service : popularServices) {
+                Row row = serviceSheet.createRow(serviceRowIndex++);
+                row.createCell(0).setCellValue(service.getId());
+                row.createCell(1).setCellValue(service.getName());
+                row.createCell(2).setCellValue(service.getCategory());
+                row.createCell(3).setCellValue(service.getDescription());
+                row.createCell(4).setCellValue(service.getPriceText());
+            }
+
+            for (int i = 0; i < 3; i++) {
+                summarySheet.autoSizeColumn(i);
+            }
+            for (int i = 0; i < 5; i++) {
+                serviceSheet.autoSizeColumn(i);
+            }
+
+            workbook.write(response.getOutputStream());
+        }
     }
 }
