@@ -14,9 +14,14 @@ import java.sql.Connection;
  * @author PC
  */
 public class DatabaseConnection {
-    private static final String URL =
-            "mysql://u6iyzwrkw74bbv25:EYmP7FW3ntrjGUnLsjIg@b66hancuzjarvzrp8bb4-mysql.services.clever-cloud.com:3306/b66hancuzjarvzrp8bb4";
+    // Đã cập nhật URL trỏ đến máy chủ Clever Cloud, hỗ trợ Unicode tiếng Việt đầy đủ
+    private static final String URL = 
+            "jdbc:mysql://b66hancuzjarvzrp8bb4-mysql.services.clever-cloud.com:3306/b66hancuzjarvzrp8bb4?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Ho_Chi_Minh";
+    
+    // Tài khoản kết nối do Clever Cloud cấp phát
     private static final String USER = "u6iyzwrkw74bbv25";
+    
+    // BẠN LƯU Ý: Hãy mở trang Clever Cloud, copy mật khẩu thật ở dòng 'Password' rồi dán đè thay thế cho chữ dưới đây nha!
     private static final String PASSWORD = "EYmP7FW3ntrjGUnLsjIg";
 
     public static Connection getConnection() throws SQLException {
