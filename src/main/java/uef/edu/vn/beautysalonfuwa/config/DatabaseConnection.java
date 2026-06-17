@@ -15,9 +15,9 @@ import java.sql.Connection;
  */
 public class DatabaseConnection {
     private static final String URL =
-            "jdbc:mysql://localhost:3306/beauty_salon_fuwa?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Ho_Chi_Minh";
-    private static final String USER = "root";
-    private static final String PASSWORD = "123456";
+            "mysql://u6iyzwrkw74bbv25:EYmP7FW3ntrjGUnLsjIg@b66hancuzjarvzrp8bb4-mysql.services.clever-cloud.com:3306/b66hancuzjarvzrp8bb4";
+    private static final String USER = "u6iyzwrkw74bbv25";
+    private static final String PASSWORD = "EYmP7FW3ntrjGUnLsjIg";
 
     public static Connection getConnection() throws SQLException {
         try {
